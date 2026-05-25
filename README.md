@@ -20,7 +20,7 @@ To install `terminal-spawn` search for [terminal-spawn](https://web.pulsar-edit.
 
 Commands available in `atom-workspace`:
 
-- `terminal-spawn:root`: <kbd>Alt+`</kbd> spawn the terminal in the project root directory,
+- `terminal-spawn:root`: spawn the terminal in the project root directory,
 - `terminal-spawn:open`: spawn the terminal in the selected or active file's directory,
 - `terminal-spawn:list`: open a list of terminal presets and apply the chosen one to the settings.
 
