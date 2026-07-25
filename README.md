@@ -1,6 +1,8 @@
 # terminal-spawn
 
-Spawn the system terminal in the current file or project directory. Distinct from the built-in `terminal` package: this one launches the OS terminal application as a separate process, not an embedded one.
+Spawn the system terminal in the current file or project directory.
+
+Distinct from the built-in `terminal` package: this one launches the OS terminal application as a separate process, not an embedded one.
 
 ## Features
 

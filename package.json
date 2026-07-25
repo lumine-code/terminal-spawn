@@ -1,7 +1,7 @@
 {
   "name": "terminal-spawn",
   "author": "lumine-code",
-  "description": "Spawn the system terminal in the current file or project directory",
+  "description": "Spawn the system terminal in the current file or project directory.",
   "repository": "https://github.com/lumine-code/terminal-spawn",
   "bugs": {
     "url": "https://github.com/lumine-code/terminal-spawn/issues"
