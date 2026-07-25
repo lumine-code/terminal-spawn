@@ -7,12 +7,12 @@
     "url": "https://github.com/lumine-code/terminal-spawn/issues"
   },
   "keywords": [
-    "terminal",
-    "cmd",
     "shell",
+    "cmd",
     "console",
-    "spawn",
-    "external"
+    "external",
+    "launch",
+    "os-terminal"
   ],
   "version": "1.0.0",
   "license": "MIT",
