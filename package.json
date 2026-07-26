@@ -30,7 +30,7 @@
     "terminal-spawn": {
       "description": "Spawn the configured external terminal at a path, optionally with a command",
       "versions": {
-        "1.0.0": "provideTerminalSpawnService"
+        "1.0.0": "provideTerminalSpawn"
       }
     }
   },

@@ -77,12 +77,12 @@ describe("terminal-spawn", () => {
 
   describe("the terminal-spawn service", () => {
     it("exposes an open function", () => {
-      const service = mainModule.provideTerminalSpawnService();
+      const service = mainModule.provideTerminalSpawn();
       expect(typeof service.open).toBe("function");
     });
 
     it("spawns the terminal at the given directory", () => {
-      const service = mainModule.provideTerminalSpawnService();
+      const service = mainModule.provideTerminalSpawn();
       service.open(__dirname);
 
       const template = atom.config.get("terminal-spawn.command");
@@ -91,7 +91,7 @@ describe("terminal-spawn", () => {
     });
 
     it("uses the command template when a command is given", () => {
-      const service = mainModule.provideTerminalSpawnService();
+      const service = mainModule.provideTerminalSpawn();
       service.open(__dirname, "npm test");
 
       const template = atom.config.get("terminal-spawn.commandWithArgs");
@@ -100,7 +100,7 @@ describe("terminal-spawn", () => {
     });
 
     it("resolves a file path to its parent directory", () => {
-      const service = mainModule.provideTerminalSpawnService();
+      const service = mainModule.provideTerminalSpawn();
       service.open(__filename);
 
       const cwd = path.dirname(__filename);
