@@ -47,7 +47,7 @@ Supports `{cwd}` and `{command}` placeholders.
 
 ## Services
 
-- **terminal-spawn** (`1.0.0`): provided to packages that need an external terminal; exposes `open(dirpath, command)` which spawns the user-configured terminal at `dirpath`. If `command` is given, the terminal opens with that command pre-executed (using the `Terminal command with arguments` template). If `dirpath` is falsy, falls back to the active project root; if it points to a file, its parent directory is used.
+- **[terminal-spawn](docs/terminal-spawn.md)** (`1.0.0`): provided to packages that need an external terminal; exposes `open(dirpath, command)` which spawns the user-configured terminal at `dirpath`. If `command` is given, the terminal opens with that command pre-executed (using the `Terminal command with arguments` template). If `dirpath` is falsy, falls back to the active project root; if it points to a file, its parent directory is used.
 
 ## Contributing
 
