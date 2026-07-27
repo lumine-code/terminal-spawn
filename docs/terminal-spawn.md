@@ -9,7 +9,7 @@ Opens the user's external terminal application at a directory, optionally with a
 | Consumed by | `consumeTerminalSpawn(terminalSpawn)`                             |
 | Owner       | [`terminal-spawn`](https://github.com/lumine-code/terminal-spawn) |
 
-The counterpart to [`terminal`](https://lumine-code.github.io/docs.html#services/terminal): that one runs commands inside the editor, this one hands the user off to their real terminal. Use it when the work outlives the editor session or wants a full shell.
+The counterpart to `terminal`: that one runs commands inside the editor, this one hands the user off to their real terminal. Use it when the work outlives the editor session or wants a full shell.
 
 ## Registration
 
