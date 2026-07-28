@@ -1,20 +1,22 @@
 const path = require("path");
 const { PRESETS } = require("../lib/presets");
 
-// The editor checkout is not at a fixed relative path from this repository —
-// siblings in CI, two levels apart in the workspace — so `spec/helpers/
-// modal-helpers` cannot be required from here. This is the same settle it
-// performs: drain the kernel's coalescing timers, then wait on the source run.
-async function settleModal() {
-  const session = atom.modals.getActiveSession();
-  if (!session) return;
-  if (typeof advanceClock === "function") advanceClock(0);
-  await Promise.resolve();
-  const run = session.frames.length > 0 ? session.frame.run : null;
-  if (run) await run.whenSettled();
-  if (typeof advanceClock === "function") advanceClock(0);
-  await Promise.resolve();
-}
+// The shared modal vocabulary lives in the editor checkout, which sits beside
+// this repository in CI and one level further up in the development workspace,
+// so resolve it through the running editor rather than by a relative path.
+const {
+  activeSession,
+  cancel,
+  confirm,
+  confirmItem,
+  emptyMessageText,
+  isModalOpen,
+  modalElement,
+  settle,
+  setQuery,
+  visibleItems,
+  visibleLabels,
+} = require(path.join(atom.getLoadSettings().resourcePath, "spec", "helpers", "modal-helpers"));
 
 describe("terminal-spawn", () => {
   let workspaceElement, mainModule;
@@ -102,69 +104,106 @@ describe("terminal-spawn", () => {
   });
 
   describe("terminal-spawn:list", () => {
-    afterEach(() => {
-      atom.modals.cancel("spec");
+    // Every platform's presets, in the order the list renders them.
+    const platformPresets = PRESETS.filter((preset) => preset.platform === process.platform);
+
+    afterEach(async () => {
+      if (isModalOpen()) cancel();
+      await settle();
     });
 
     it("shows the preset list and applies the confirmed preset", async () => {
       atom.commands.dispatch(workspaceElement, "terminal-spawn:list");
-      await settleModal();
+      await settle();
 
-      const session = atom.modals.getActiveSession();
+      const session = activeSession();
       expect(session).not.toBeNull();
       expect(session.rootSpec.id).toBe("terminal-spawn.presets");
-      expect(session.element.classList.contains("terminal-spawn-list")).toBe(true);
-      expect(session.element.querySelectorAll("ol.list-group > li").length).toBeGreaterThan(0);
+      expect(modalElement().classList.contains("terminal-spawn-list")).toBe(true);
 
-      atom.commands.dispatch(session.element, "core:confirm");
-      await settleModal();
+      // Deliberately not the first row: on every platform the first preset is
+      // also that platform's config default, so confirming it would assert
+      // nothing about whether the confirm handler ran at all.
+      const preset = platformPresets[1];
+      await confirmItem(preset);
 
-      const preset = PRESETS.find((p) => p.platform === process.platform);
+      expect(isModalOpen()).toBe(false);
       expect(atom.config.get("terminal-spawn.command")).toBe(preset.command);
       expect(atom.config.get("terminal-spawn.commandWithArgs")).toBe(preset.commandWithArgs);
     });
 
     it("lists only the presets of the running platform, command lines below the name", async () => {
       atom.commands.dispatch(workspaceElement, "terminal-spawn:list");
-      await settleModal();
+      await settle();
 
-      const session = atom.modals.getActiveSession();
-      const expected = PRESETS.filter((preset) => preset.platform === process.platform);
-      expect(session.getVisibleItems()).toEqual(expected);
+      expect(visibleItems()).toEqual(platformPresets);
+      expect(visibleLabels()).toEqual(platformPresets.map((preset) => preset.name));
 
-      const row = session.element.querySelector("ol.list-group > li");
-      expect(row.querySelector(".primary-text").textContent).toBe(expected[0].name);
+      const row = modalElement().querySelector("ol.list-group > li");
       const details = Array.from(row.querySelectorAll(".secondary-line")).map(
         (line) => line.textContent,
       );
-      expect(details).toEqual([expected[0].command, expected[0].commandWithArgs]);
+      expect(details).toEqual([platformPresets[0].command, platformPresets[0].commandWithArgs]);
+    });
+
+    it("highlights the matched characters of the preset name", async () => {
+      atom.commands.dispatch(workspaceElement, "terminal-spawn:list");
+      await settle();
+
+      // The old list highlighted the name by hand; the kernel now does it from
+      // `ctx.highlights.label`, so the rendered spans are worth pinning down.
+      const preset = platformPresets[0];
+      const query = preset.name.slice(0, 3);
+      setQuery(query);
+      await settle();
+
+      const row = Array.from(modalElement().querySelectorAll("ol.list-group > li")).find(
+        (li) => li.querySelector(".primary-text").textContent === preset.name,
+      );
+      expect(row).toBeTruthy();
+      const matched = Array.from(row.querySelectorAll(".primary-text .character-match"))
+        .map((span) => span.textContent)
+        .join("");
+      expect(matched.toLowerCase()).toBe(query.toLowerCase());
     });
 
     it("stays open on a query that matches nothing", async () => {
       atom.commands.dispatch(workspaceElement, "terminal-spawn:list");
-      await settleModal();
+      await settle();
 
-      const session = atom.modals.getActiveSession();
+      const session = activeSession();
       const command = atom.config.get("terminal-spawn.command");
-      session.setQuery("no-such-preset");
-      await settleModal();
-      expect(session.getVisibleItems().length).toBe(0);
+      setQuery("no-such-preset");
+      await settle();
+      expect(visibleItems().length).toBe(0);
+      expect(emptyMessageText()).toBe("No presets match this platform");
 
-      atom.commands.dispatch(session.element, "core:confirm");
-      await settleModal();
-      expect(atom.modals.getActiveSession()).toBe(session);
+      confirm();
+      await settle();
+      expect(activeSession()).toBe(session);
       expect(atom.config.get("terminal-spawn.command")).toBe(command);
     });
 
     it("reopens on a second invocation", async () => {
       atom.commands.dispatch(workspaceElement, "terminal-spawn:list");
-      await settleModal();
-      atom.commands.dispatch(workspaceElement, "terminal-spawn:list");
-      await settleModal();
+      await settle();
+      const first = activeSession();
 
-      const session = atom.modals.getActiveSession();
-      expect(session).not.toBeNull();
-      expect(session.getVisibleItems().length).toBeGreaterThan(0);
+      atom.commands.dispatch(workspaceElement, "terminal-spawn:list");
+      await settle();
+
+      expect(activeSession()).not.toBeNull();
+      expect(activeSession()).not.toBe(first);
+      expect(visibleItems().length).toBeGreaterThan(0);
+    });
+
+    it("closes the list when the package deactivates", async () => {
+      atom.commands.dispatch(workspaceElement, "terminal-spawn:list");
+      await settle();
+      expect(isModalOpen()).toBe(true);
+
+      await atom.packages.deactivatePackage("terminal-spawn");
+      expect(isModalOpen()).toBe(false);
     });
   });
 });
