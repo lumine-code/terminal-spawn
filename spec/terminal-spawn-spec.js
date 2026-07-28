@@ -1,28 +1,19 @@
 const path = require("path");
 const { PRESETS } = require("../lib/presets");
 
-// The spec runner freezes `setTimeout`, so poll on animation frames instead.
-function waitFor(predicate, timeout = 8000) {
-  const start = Date.now();
-  return new Promise((resolve, reject) => {
-    const check = () => {
-      let value;
-      try {
-        value = predicate();
-      } catch (error) {
-        reject(error);
-        return;
-      }
-      if (value) {
-        resolve(value);
-      } else if (Date.now() - start > timeout) {
-        reject(new Error("Timed out waiting for condition"));
-      } else {
-        requestAnimationFrame(check);
-      }
-    };
-    check();
-  });
+// The editor checkout is not at a fixed relative path from this repository —
+// siblings in CI, two levels apart in the workspace — so `spec/helpers/
+// modal-helpers` cannot be required from here. This is the same settle it
+// performs: drain the kernel's coalescing timers, then wait on the source run.
+async function settleModal() {
+  const session = atom.modals.getActiveSession();
+  if (!session) return;
+  if (typeof advanceClock === "function") advanceClock(0);
+  await Promise.resolve();
+  const run = session.frames.length > 0 ? session.frame.run : null;
+  if (run) await run.whenSettled();
+  if (typeof advanceClock === "function") advanceClock(0);
+  await Promise.resolve();
 }
 
 describe("terminal-spawn", () => {
@@ -111,18 +102,69 @@ describe("terminal-spawn", () => {
   });
 
   describe("terminal-spawn:list", () => {
+    afterEach(() => {
+      atom.modals.cancel("spec");
+    });
+
     it("shows the preset list and applies the confirmed preset", async () => {
       atom.commands.dispatch(workspaceElement, "terminal-spawn:list");
+      await settleModal();
 
-      const listElement = await waitFor(() => document.querySelector(".terminal-spawn-list"));
-      await waitFor(() => listElement.querySelectorAll("li").length > 0);
+      const session = atom.modals.getActiveSession();
+      expect(session).not.toBeNull();
+      expect(session.rootSpec.id).toBe("terminal-spawn.presets");
+      expect(session.element.classList.contains("terminal-spawn-list")).toBe(true);
+      expect(session.element.querySelectorAll("ol.list-group > li").length).toBeGreaterThan(0);
 
-      const queryEditor = listElement.querySelector("atom-text-editor");
-      atom.commands.dispatch(queryEditor, "core:confirm");
+      atom.commands.dispatch(session.element, "core:confirm");
+      await settleModal();
 
       const preset = PRESETS.find((p) => p.platform === process.platform);
       expect(atom.config.get("terminal-spawn.command")).toBe(preset.command);
       expect(atom.config.get("terminal-spawn.commandWithArgs")).toBe(preset.commandWithArgs);
+    });
+
+    it("lists only the presets of the running platform, command lines below the name", async () => {
+      atom.commands.dispatch(workspaceElement, "terminal-spawn:list");
+      await settleModal();
+
+      const session = atom.modals.getActiveSession();
+      const expected = PRESETS.filter((preset) => preset.platform === process.platform);
+      expect(session.getVisibleItems()).toEqual(expected);
+
+      const row = session.element.querySelector("ol.list-group > li");
+      expect(row.querySelector(".primary-text").textContent).toBe(expected[0].name);
+      const details = Array.from(row.querySelectorAll(".secondary-line")).map(
+        (line) => line.textContent,
+      );
+      expect(details).toEqual([expected[0].command, expected[0].commandWithArgs]);
+    });
+
+    it("stays open on a query that matches nothing", async () => {
+      atom.commands.dispatch(workspaceElement, "terminal-spawn:list");
+      await settleModal();
+
+      const session = atom.modals.getActiveSession();
+      const command = atom.config.get("terminal-spawn.command");
+      session.setQuery("no-such-preset");
+      await settleModal();
+      expect(session.getVisibleItems().length).toBe(0);
+
+      atom.commands.dispatch(session.element, "core:confirm");
+      await settleModal();
+      expect(atom.modals.getActiveSession()).toBe(session);
+      expect(atom.config.get("terminal-spawn.command")).toBe(command);
+    });
+
+    it("reopens on a second invocation", async () => {
+      atom.commands.dispatch(workspaceElement, "terminal-spawn:list");
+      await settleModal();
+      atom.commands.dispatch(workspaceElement, "terminal-spawn:list");
+      await settleModal();
+
+      const session = atom.modals.getActiveSession();
+      expect(session).not.toBeNull();
+      expect(session.getVisibleItems().length).toBeGreaterThan(0);
     });
   });
 });
