@@ -1,9 +1,16 @@
 {
   "context-menu": {
-    "atom-text-editor:not([mini]), .tree-view .tree-view-root:not(.multi-select) .file, .tree-view .tree-view-root:not(.multi-select) .directory": [
-      { "type": "separator" },
-      { "label": "Spawn Terminal Here", "command": "terminal-spawn:open" },
-      { "type": "separator" }
+    "atom-text-editor:not([mini]), .tree-view .full-menu:not(.multi-select) .file, .tree-view .full-menu:not(.multi-select) .directory": [
+      {
+        "type": "separator"
+      },
+      {
+        "label": "Spawn Terminal Here",
+        "command": "terminal-spawn:open"
+      },
+      {
+        "type": "separator"
+      }
     ]
   },
   "menu": [
@@ -13,9 +20,18 @@
         {
           "label": "Terminal Spawn",
           "submenu": [
-            { "label": "Spawn Terminal Here", "command": "terminal-spawn:open" },
-            { "label": "Spawn Terminal at Project Root", "command": "terminal-spawn:root" },
-            { "label": "Select Preset…", "command": "terminal-spawn:list" }
+            {
+              "label": "Spawn Terminal Here",
+              "command": "terminal-spawn:open"
+            },
+            {
+              "label": "Spawn Terminal at Project Root",
+              "command": "terminal-spawn:root"
+            },
+            {
+              "label": "Select Preset…",
+              "command": "terminal-spawn:list"
+            }
           ]
         }
       ]
