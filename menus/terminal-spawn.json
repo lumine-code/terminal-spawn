@@ -1,6 +1,6 @@
 {
   "context-menu": {
-    "atom-text-editor:not([mini]), .tree-view .full-menu:not(.multi-select) .file, .tree-view .full-menu:not(.multi-select) .directory": [
+    "lumine-text-editor:not([mini]), .tree-view .full-menu:not(.multi-select) .file, .tree-view .full-menu:not(.multi-select) .directory": [
       {
         "type": "separator"
       },

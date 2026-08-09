@@ -41,7 +41,7 @@ type TerminalSpawn = {
 ## Minimal example
 
 ```js
-const { Disposable } = require("atom");
+const { Disposable } = require("lumine");
 
 module.exports = {
   consumeTerminalSpawn(terminalSpawn) {
@@ -51,7 +51,7 @@ module.exports = {
 
   openHere() {
     // A file path is fine — the parent directory is used.
-    this.spawn?.open(atom.workspace.getActiveTextEditor()?.getPath());
+    this.spawn?.open(lumine.workspace.getActiveTextEditor()?.getPath());
   },
 };
 ```

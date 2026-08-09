@@ -29,14 +29,14 @@ describe("terminal-spawn", () => {
   let workspaceElement, mainModule;
 
   beforeEach(async () => {
-    workspaceElement = atom.views.getView(atom.workspace);
+    workspaceElement = lumine.views.getView(lumine.workspace);
     jasmine.attachToDOM(workspaceElement);
-    ({ mainModule } = await atom.packages.activatePackage("terminal-spawn"));
+    ({ mainModule } = await lumine.packages.activatePackage("terminal-spawn"));
     spyOn(mainModule, "spawnCommand");
   });
 
   it("registers its workspace commands", () => {
-    const commands = atom.commands
+    const commands = lumine.commands
       .findCommands({ target: workspaceElement })
       .map((command) => command.name);
     expect(commands).toContain("terminal-spawn:root");
@@ -46,30 +46,30 @@ describe("terminal-spawn", () => {
 
   describe("terminal-spawn:root", () => {
     it("spawns the configured terminal at the project root", () => {
-      atom.project.setPaths([__dirname]);
-      const root = atom.project.getPaths()[0];
-      atom.commands.dispatch(workspaceElement, "terminal-spawn:root");
+      lumine.project.setPaths([__dirname]);
+      const root = lumine.project.getPaths()[0];
+      lumine.commands.dispatch(workspaceElement, "terminal-spawn:root");
 
-      const template = atom.config.get("terminal-spawn.command");
+      const template = lumine.config.get("terminal-spawn.command");
       const expected = template.replaceAll("{cwd}", root).replaceAll("{command}", "");
       expect(mainModule.spawnCommand).toHaveBeenCalledWith(expected, root);
     });
 
     it("does nothing without a project root", () => {
-      atom.project.setPaths([]);
-      atom.commands.dispatch(workspaceElement, "terminal-spawn:root");
+      lumine.project.setPaths([]);
+      lumine.commands.dispatch(workspaceElement, "terminal-spawn:root");
       expect(mainModule.spawnCommand).not.toHaveBeenCalled();
     });
   });
 
   describe("terminal-spawn:open", () => {
     it("spawns the terminal in the active file's directory", async () => {
-      const editor = await atom.workspace.open(__filename);
-      const editorElement = atom.views.getView(editor);
-      atom.commands.dispatch(editorElement, "terminal-spawn:open");
+      const editor = await lumine.workspace.open(__filename);
+      const editorElement = lumine.views.getView(editor);
+      lumine.commands.dispatch(editorElement, "terminal-spawn:open");
 
       const cwd = path.dirname(__filename);
-      const template = atom.config.get("terminal-spawn.command");
+      const template = lumine.config.get("terminal-spawn.command");
       const expected = template.replaceAll("{cwd}", cwd).replaceAll("{command}", "");
       expect(mainModule.spawnCommand).toHaveBeenCalledWith(expected, cwd);
     });
@@ -85,7 +85,7 @@ describe("terminal-spawn", () => {
       const service = mainModule.provideTerminalSpawn();
       service.open(__dirname);
 
-      const template = atom.config.get("terminal-spawn.command");
+      const template = lumine.config.get("terminal-spawn.command");
       const expected = template.replaceAll("{cwd}", __dirname).replaceAll("{command}", "");
       expect(mainModule.spawnCommand).toHaveBeenCalledWith(expected, __dirname);
     });
@@ -94,7 +94,7 @@ describe("terminal-spawn", () => {
       const service = mainModule.provideTerminalSpawn();
       service.open(__dirname, "npm test");
 
-      const template = atom.config.get("terminal-spawn.commandWithArgs");
+      const template = lumine.config.get("terminal-spawn.commandWithArgs");
       const expected = template.replaceAll("{cwd}", __dirname).replaceAll("{command}", "npm test");
       expect(mainModule.spawnCommand).toHaveBeenCalledWith(expected, __dirname);
     });
@@ -104,7 +104,7 @@ describe("terminal-spawn", () => {
       service.open(__filename);
 
       const cwd = path.dirname(__filename);
-      const template = atom.config.get("terminal-spawn.command");
+      const template = lumine.config.get("terminal-spawn.command");
       const expected = template.replaceAll("{cwd}", cwd).replaceAll("{command}", "");
       expect(mainModule.spawnCommand).toHaveBeenCalledWith(expected, cwd);
     });
@@ -112,17 +112,17 @@ describe("terminal-spawn", () => {
 
   describe("terminal-spawn:list", () => {
     it("shows the preset list and applies the confirmed preset", async () => {
-      atom.commands.dispatch(workspaceElement, "terminal-spawn:list");
+      lumine.commands.dispatch(workspaceElement, "terminal-spawn:list");
 
       const listElement = await waitFor(() => document.querySelector(".terminal-spawn-list"));
       await waitFor(() => listElement.querySelectorAll("li").length > 0);
 
-      const queryEditor = listElement.querySelector("atom-text-editor");
-      atom.commands.dispatch(queryEditor, "core:confirm");
+      const queryEditor = listElement.querySelector("lumine-text-editor");
+      lumine.commands.dispatch(queryEditor, "core:confirm");
 
       const preset = PRESETS.find((p) => p.platform === process.platform);
-      expect(atom.config.get("terminal-spawn.command")).toBe(preset.command);
-      expect(atom.config.get("terminal-spawn.commandWithArgs")).toBe(preset.commandWithArgs);
+      expect(lumine.config.get("terminal-spawn.command")).toBe(preset.command);
+      expect(lumine.config.get("terminal-spawn.commandWithArgs")).toBe(preset.commandWithArgs);
     });
   });
 });

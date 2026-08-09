@@ -18,7 +18,7 @@ To install `terminal-spawn` search for _terminal-spawn_ in the Install pane of t
 
 ## Commands
 
-Commands available in `atom-workspace`:
+Commands available in `lumine-workspace`:
 
 - `terminal-spawn:root`: spawn the terminal in the project root directory,
 - `terminal-spawn:open`: spawn the terminal in the selected or active file's directory,
