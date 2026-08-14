@@ -14,7 +14,7 @@ Distinct from the built-in `terminal` package: this one launches the OS terminal
 
 ## Installation
 
-To install `terminal-spawn` search for _terminal-spawn_ in the Install pane of the Lumine settings or run `lumine --install lumine-code/terminal-spawn`.
+To install `terminal-spawn` search for it in the Install pane of the Lumine settings, or run the command `lumine --install lumine-code/terminal-spawn`.
 
 ## Commands
 
@@ -47,7 +47,7 @@ Supports `{cwd}` and `{command}` placeholders.
 
 ## Services
 
-- **[terminal-spawn](docs/terminal-spawn.md)** (`1.0.0`): provided to packages that need an external terminal; exposes `open(dirpath, command)` which spawns the user-configured terminal at `dirpath`. If `command` is given, the terminal opens with that command pre-executed (using the `Terminal command with arguments` template). If `dirpath` is falsy, falls back to the active project root; if it points to a file, its parent directory is used.
+- [`terminal-spawn`](docs/terminal-spawn.md): provided to packages that need an external terminal; exposes `open(dirpath, command)` which spawns the user-configured terminal at `dirpath`. If `command` is given, the terminal opens with that command pre-executed (using the `Terminal command with arguments` template). If `dirpath` is falsy, falls back to the active project root; if it points to a file, its parent directory is used.
 
 ## Contributing
 
