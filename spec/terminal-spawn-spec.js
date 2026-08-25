@@ -1,4 +1,5 @@
 const path = require("path");
+const childProcess = require("child_process");
 const { PRESETS } = require("../lib/presets");
 
 // The spec runner freezes `setTimeout`, so poll on animation frames instead.
@@ -83,11 +84,12 @@ describe("terminal-spawn", () => {
 
     it("spawns the terminal at the given directory", () => {
       const service = mainModule.provideTerminalSpawn();
-      service.open(__dirname);
+      const result = service.open(__dirname);
 
       const template = lumine.config.get("terminal-spawn.command");
       const expected = template.replaceAll("{cwd}", __dirname).replaceAll("{command}", "");
       expect(mainModule.spawnCommand).toHaveBeenCalledWith(expected, __dirname);
+      expect(result).toBeUndefined();
     });
 
     it("uses the command template when a command is given", () => {
@@ -110,6 +112,90 @@ describe("terminal-spawn", () => {
     });
   });
 
+  describe("the MCP bridge environment", () => {
+    const bridgeVariables = ["LUMINE_BRIDGE_HOST", "LUMINE_BRIDGE_PORT", "LUMINE_BRIDGE_TOKEN"];
+    let previousEnvironment;
+
+    beforeEach(() => {
+      previousEnvironment = new Map(
+        bridgeVariables.map((key) => [
+          key,
+          Object.prototype.hasOwnProperty.call(process.env, key) ? process.env[key] : undefined,
+        ]),
+      );
+      process.env.LUMINE_BRIDGE_HOST = "stale-host";
+      process.env.LUMINE_BRIDGE_PORT = "3999";
+      process.env.LUMINE_BRIDGE_TOKEN = "stale-token";
+      mainModule.spawnCommand.and.callThrough();
+      spyOn(childProcess, "exec").and.returnValue({ pid: 1234 });
+    });
+
+    afterEach(() => {
+      for (const [key, value] of previousEnvironment) {
+        if (value === undefined) delete process.env[key];
+        else process.env[key] = value;
+      }
+    });
+
+    it("waits for the current bridge port and passes only that bridge variable", async () => {
+      let resolvePort;
+      const getBridgePortWhenReady = jasmine
+        .createSpy("getBridgePortWhenReady")
+        .and.returnValue(new Promise((resolve) => (resolvePort = resolve)));
+      mainModule.consumeMcpBridge({ getBridgePortWhenReady });
+
+      const launch = mainModule.spawnCommand("terminal", __dirname);
+      expect(childProcess.exec).not.toHaveBeenCalled();
+
+      resolvePort(4321);
+      await launch;
+
+      const options = childProcess.exec.calls.mostRecent().args[1];
+      expect(options.env.LUMINE_BRIDGE_PORT).toBe("4321");
+      expect(options.env.LUMINE_BRIDGE_HOST).toBeUndefined();
+      expect(options.env.LUMINE_BRIDGE_TOKEN).toBeUndefined();
+    });
+
+    it("asks the bridge for its current port before every launch", async () => {
+      const getBridgePortWhenReady = jasmine
+        .createSpy("getBridgePortWhenReady")
+        .and.returnValues(Promise.resolve(4321), Promise.resolve(4322));
+      mainModule.consumeMcpBridge({ getBridgePortWhenReady });
+
+      await mainModule.spawnCommand("first", __dirname);
+      await mainModule.spawnCommand("second", __dirname);
+
+      expect(getBridgePortWhenReady).toHaveBeenCalledTimes(2);
+      expect(childProcess.exec.calls.argsFor(0)[1].env.LUMINE_BRIDGE_PORT).toBe("4321");
+      expect(childProcess.exec.calls.argsFor(1)[1].env.LUMINE_BRIDGE_PORT).toBe("4322");
+    });
+
+    it("opens normally without bridge variables when the bridge fails", async () => {
+      mainModule.consumeMcpBridge({
+        getBridgePortWhenReady: () => Promise.reject(new Error("bridge failed")),
+      });
+
+      await mainModule.spawnCommand("terminal", __dirname);
+
+      const options = childProcess.exec.calls.mostRecent().args[1];
+      expect(options.env.LUMINE_BRIDGE_HOST).toBeUndefined();
+      expect(options.env.LUMINE_BRIDGE_PORT).toBeUndefined();
+      expect(options.env.LUMINE_BRIDGE_TOKEN).toBeUndefined();
+    });
+
+    it("stops using the bridge after its service is disposed", async () => {
+      const disposable = mainModule.consumeMcpBridge({
+        getBridgePortWhenReady: () => Promise.resolve(4321),
+      });
+      disposable.dispose();
+
+      await mainModule.spawnCommand("terminal", __dirname);
+
+      const options = childProcess.exec.calls.mostRecent().args[1];
+      expect(options.env.LUMINE_BRIDGE_PORT).toBeUndefined();
+    });
+  });
+
   describe("terminal-spawn:list", () => {
     it("shows the preset list and applies the confirmed preset", async () => {
       lumine.commands.dispatch(workspaceElement, "terminal-spawn:list");
@@ -124,5 +210,16 @@ describe("terminal-spawn", () => {
       expect(lumine.config.get("terminal-spawn.command")).toBe(preset.command);
       expect(lumine.config.get("terminal-spawn.commandWithArgs")).toBe(preset.commandWithArgs);
     });
+  });
+
+  it("makes every Windows Terminal preset inherit the launching environment", () => {
+    const windowsTerminalPresets = PRESETS.filter(
+      (preset) => preset.platform === "win32" && preset.name.startsWith("Windows Terminal"),
+    );
+    expect(windowsTerminalPresets.length).toBe(2);
+    for (const preset of windowsTerminalPresets) {
+      expect(preset.command).toContain("new-tab --inheritEnvironment");
+      expect(preset.commandWithArgs).toContain("new-tab --inheritEnvironment");
+    }
   });
 });

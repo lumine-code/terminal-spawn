@@ -60,6 +60,10 @@ module.exports = {
 
 The path handling is forgiving on purpose: pass whatever you have. A file path resolves to its directory, and passing nothing at all opens at the project root, so a consumer rarely needs to normalise anything itself.
 
+When the `mcp.bridge` service is available, every launch asks it for the current window's bridge port and passes that port to the external terminal as `LUMINE_BRIDGE_PORT`. It never passes the bridge token, and knowing the port does not authorize an MCP client: `ConnectToLumine()` still requires the user to approve the connection in Lumine. A missing or failed bridge does not prevent the terminal from opening.
+
+An emulator may delegate a new tab to an already-running GUI process that does not inherit the launcher's environment. The package deliberately does not force a separate application instance; when the variable is absent, pass the port reported by `Lumine MCP: Status` to the agent explicitly.
+
 **Which terminal opens is the user's setting**, as is the template used to pass a command. Do not build shell invocations expecting a particular emulator or shell — supply the command and let the template place it.
 
 `open` returns nothing and reports nothing. There is no way to know whether the terminal launched, whether the command ran, or what it produced. If you need the result, this is the wrong service.

@@ -11,6 +11,7 @@ Distinct from the built-in `terminal` package: this one launches the OS terminal
 - **Configurable command**: customize the shell command used on each platform.
 - **Spawn with command**: launch the terminal with a command pre-executed inside it (via the provided service).
 - **Preset list**: pick from a list of per-platform terminal presets to populate the settings.
+- **Lumine MCP targeting**: new terminals inherit the current window's bridge port when `lumine-mcp` is available, while every agent still needs your approval before it can connect.
 
 ## Installation
 
@@ -33,8 +34,8 @@ Pick a row matching your terminal of choice. Use `terminal-spawn:list` to apply 
 | Windows  | Command Prompt (default)      | `start /D "{cwd}" cmd`                                                  | `start /D "{cwd}" cmd /K "{command}"`                                                                                        |
 | Windows  | Windows PowerShell            | `start powershell -NoExit -Command "Set-Location -LiteralPath '{cwd}'"` | `start powershell -NoExit -Command "Set-Location -LiteralPath '{cwd}'; {command}"`                                           |
 | Windows  | PowerShell 7                  | `start pwsh -NoExit -Command "Set-Location -LiteralPath '{cwd}'"`       | `start pwsh -NoExit -Command "Set-Location -LiteralPath '{cwd}'; {command}"`                                                 |
-| Windows  | Windows Terminal (new window) | `wt -d "{cwd}"`                                                         | `wt -d "{cwd}" cmd /K "{command}"`                                                                                           |
-| Windows  | Windows Terminal (new tab)    | `wt -w 0 nt -d "{cwd}"`                                                 | `wt -w 0 nt -d "{cwd}" cmd /K "{command}"`                                                                                   |
+| Windows  | Windows Terminal (new window) | `wt -w new new-tab --inheritEnvironment -d "{cwd}"`                     | `wt -w new new-tab --inheritEnvironment -d "{cwd}" cmd /K "{command}"`                                                       |
+| Windows  | Windows Terminal (new tab)    | `wt -w 0 new-tab --inheritEnvironment -d "{cwd}"`                       | `wt -w 0 new-tab --inheritEnvironment -d "{cwd}" cmd /K "{command}"`                                                         |
 | macOS    | Terminal.app (default)        | `open -a Terminal.app "{cwd}"`                                          | `osascript -e 'tell app "Terminal" to do script "cd \"{cwd}\" && {command}"'`                                                |
 | macOS    | iTerm2                        | `open -a iTerm "{cwd}"`                                                 | `osascript -e 'tell app "iTerm" to create window with default profile command "bash -c \"cd {cwd}; {command}; exec bash\""'` |
 | Linux    | Default emulator (default)    | `x-terminal-emulator`                                                   | `x-terminal-emulator -e bash -c 'cd "{cwd}"; {command}; exec bash'`                                                          |
@@ -44,6 +45,10 @@ Pick a row matching your terminal of choice. Use `terminal-spawn:list` to apply 
 | Linux    | Kitty                         | `kitty @ launch --type tab --cwd "{cwd}"`                               | `kitty @ launch --type tab --cwd "{cwd}" bash -c '{command}; exec bash'`                                                     |
 
 Supports `{cwd}` and `{command}` placeholders.
+
+When `lumine-mcp` is running, `terminal-spawn` removes any inherited `LUMINE_BRIDGE_HOST`, `LUMINE_BRIDGE_PORT`, and `LUMINE_BRIDGE_TOKEN`, then supplies only the current window's `LUMINE_BRIDGE_PORT` to the new terminal. This lets an MCP client call `ConnectToLumine()` without being told a port, but does not authorize it: Lumine still asks you to allow or deny every connection. If the bridge is unavailable, the terminal opens normally without MCP targeting information.
+
+An emulator that delegates new tabs to an already-running GUI process may discard the launcher's environment. In that case, use `Lumine MCP: Status` and give its port to the agent explicitly; `terminal-spawn` does not force a separate emulator instance just to carry the variable.
 
 ## Services
 
