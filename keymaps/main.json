@@ -1,5 +1,5 @@
 {
   "lumine-workspace": {
-    "alt-`": "terminal-spawn:root"
+    "alt-`": "terminal-spawn:open"
   }
 }

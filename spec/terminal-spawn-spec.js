@@ -74,6 +74,34 @@ describe("terminal-spawn", () => {
       const expected = template.replaceAll("{cwd}", cwd).replaceAll("{command}", "");
       expect(mainModule.spawnCommand).toHaveBeenCalledWith(expected, cwd);
     });
+
+    it("spawns the terminal at the tree view's last selection", () => {
+      const treeView = document.createElement("div");
+      treeView.classList.add("tree-view");
+      const entry = document.createElement("div");
+      entry.classList.add("selected");
+      entry.getPath = () => __filename;
+      treeView.appendChild(entry);
+      workspaceElement.appendChild(treeView);
+
+      lumine.commands.dispatch(treeView, "terminal-spawn:open");
+
+      const cwd = path.dirname(__filename);
+      const template = lumine.config.get("terminal-spawn.command");
+      const expected = template.replaceAll("{cwd}", cwd).replaceAll("{command}", "");
+      expect(mainModule.spawnCommand).toHaveBeenCalledWith(expected, cwd);
+    });
+
+    it("falls back to the first project root without a file context", () => {
+      lumine.project.setPaths([__dirname]);
+
+      lumine.commands.dispatch(workspaceElement, "terminal-spawn:open");
+
+      const root = lumine.project.getPaths()[0];
+      const template = lumine.config.get("terminal-spawn.command");
+      const expected = template.replaceAll("{cwd}", root).replaceAll("{command}", "");
+      expect(mainModule.spawnCommand).toHaveBeenCalledWith(expected, root);
+    });
   });
 
   describe("the terminal-spawn service", () => {

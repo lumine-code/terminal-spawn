@@ -20,7 +20,7 @@
     "lumine": "^1.0.0"
   },
   "backgroundTips": [
-    "You can open your system terminal in the project root with {{ 'terminal-spawn:root' | keystroke }}"
+    "You can open your system terminal for the current file or folder with {{ 'terminal-spawn:open' | keystroke }}"
   ],
   "main": "./lib/main",
   "files": [
