@@ -5,8 +5,19 @@
         "type": "separator"
       },
       {
-        "label": "Spawn Terminal Here",
-        "command": "terminal-spawn:open"
+        "label": "Terminal",
+        "submenu": [
+          {
+            "type": "separator"
+          },
+          {
+            "label": "Spawn New",
+            "command": "terminal-spawn:open"
+          },
+          {
+            "type": "separator"
+          }
+        ]
       },
       {
         "type": "separator"

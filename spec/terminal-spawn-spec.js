@@ -104,6 +104,22 @@ describe("terminal-spawn", () => {
     });
   });
 
+  describe("the context menu", () => {
+    it("offers Spawn New inside the shared Terminal submenu", async () => {
+      const editor = await lumine.workspace.open(__filename);
+      const terminal = lumine.contextMenu
+        .templateForElement(editor.getElement())
+        .find((item) => item.label === "Terminal");
+
+      expect(terminal.submenu).toContain(
+        jasmine.objectContaining({
+          label: "Spawn New",
+          command: "terminal-spawn:open",
+        }),
+      );
+    });
+  });
+
   describe("the terminal-spawn service", () => {
     it("exposes an open function", () => {
       const service = mainModule.provideTerminalSpawn();

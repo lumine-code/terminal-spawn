@@ -1,5 +1,5 @@
 {
   "lumine-workspace": {
-    "alt-`": "terminal-spawn:open"
+    "alt-backquote": "terminal-spawn:open"
   }
 }
