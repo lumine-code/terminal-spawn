@@ -248,7 +248,7 @@ describe("terminal-spawn", () => {
       await waitFor(() => listElement.querySelectorAll("li").length > 0);
 
       const queryEditor = listElement.querySelector("lumine-text-editor");
-      lumine.commands.dispatch(queryEditor, "core:confirm");
+      await lumine.commands.dispatch(queryEditor, "core:confirm");
 
       const preset = PRESETS.find((p) => p.platform === process.platform);
       expect(lumine.config.get("terminal-spawn.command")).toBe(preset.command);
