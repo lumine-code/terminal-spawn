@@ -68,8 +68,14 @@ describe("terminal-spawn", () => {
       lumine.commands.dispatch(workspaceElement, "terminal-spawn:root");
 
       const [command, cwd] = mainModule.spawnCommand.calls.mostRecent().args;
-      expect(command).toContain(cwd);
-      expect(command.length).toBeGreaterThan(cwd.length);
+      // Linux launches the emulator through `exec(..., {cwd})`, so its
+      // platform command is intentionally just `x-terminal-emulator`; macOS
+      // and Windows encode the directory in the command itself.
+      expect(command.length).toBeGreaterThan(0);
+      expect(cwd).toBe(__dirname);
+      if (process.platform !== "linux") {
+        expect(command).toContain(cwd);
+      }
     });
 
     it("does nothing without a project root", () => {
