@@ -36,6 +36,20 @@
     "format": "prettier --write .",
     "format:check": "prettier --check ."
   },
+  "configSchema": {
+    "command": {
+      "title": "Terminal command",
+      "description": "Shell command used to launch the terminal. Use {cwd} as a placeholder; leave blank for the platform default.",
+      "type": "string",
+      "default": ""
+    },
+    "commandWithArgs": {
+      "title": "Terminal command with arguments",
+      "description": "Template used to launch a terminal command. Use {cwd} and {command} as placeholders; leave blank for the platform default.",
+      "type": "string",
+      "default": ""
+    }
+  },
   "providedServices": {
     "terminal-spawn": {
       "description": "Spawn the configured external terminal at a path, optionally with a command",

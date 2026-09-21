@@ -34,6 +34,11 @@ describe("terminal-spawn", () => {
     jasmine.attachToDOM(workspaceElement);
     ({ mainModule } = await lumine.packages.activatePackage("terminal-spawn"));
     spyOn(mainModule, "spawnCommand");
+    lumine.config.set("terminal-spawn.command", 'test-terminal "{cwd}"');
+    lumine.config.set(
+      "terminal-spawn.commandWithArgs",
+      'test-terminal "{cwd}" --command "{command}"',
+    );
   });
 
   it("registers its workspace commands", () => {
@@ -54,6 +59,17 @@ describe("terminal-spawn", () => {
       const template = lumine.config.get("terminal-spawn.command");
       const expected = template.replaceAll("{cwd}", root).replaceAll("{command}", "");
       expect(mainModule.spawnCommand).toHaveBeenCalledWith(expected, root);
+    });
+
+    it("uses the platform command when the configured template is blank", () => {
+      lumine.project.setPaths([__dirname]);
+      lumine.config.set("terminal-spawn.command", "");
+
+      lumine.commands.dispatch(workspaceElement, "terminal-spawn:root");
+
+      const [command, cwd] = mainModule.spawnCommand.calls.mostRecent().args;
+      expect(command).toContain(cwd);
+      expect(command.length).toBeGreaterThan(cwd.length);
     });
 
     it("does nothing without a project root", () => {
