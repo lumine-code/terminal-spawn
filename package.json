@@ -19,9 +19,6 @@
   "engines": {
     "lumine": "^1.0.0"
   },
-  "backgroundTips": [
-    "You can open your system terminal for the current file or folder with {{ 'terminal-spawn:open' | keystroke }}"
-  ],
   "main": "./lib/main",
   "files": [
     "docs",
@@ -55,6 +52,11 @@
       "description": "Spawn the configured external terminal at a path, optionally with a command",
       "versions": {
         "1.0.0": "provideTerminalSpawn"
+      }
+    },
+    "background-tips.provider": {
+      "versions": {
+        "1.0.0": "provideBackgroundTips"
       }
     }
   },
