@@ -127,10 +127,18 @@ describe("terminal-spawn", () => {
   });
 
   describe("the context menu", () => {
-    it("offers Spawn New inside the shared Terminal submenu", async () => {
-      const editor = await lumine.workspace.open(__filename);
+    it("offers Spawn New inside the tree view's shared Terminal submenu", () => {
+      const treeView = document.createElement("div");
+      treeView.classList.add("tree-view");
+      const list = document.createElement("ol");
+      list.classList.add("full-menu");
+      const entry = document.createElement("li");
+      entry.classList.add("file");
+      list.appendChild(entry);
+      treeView.appendChild(list);
+      workspaceElement.appendChild(treeView);
       const terminal = lumine.contextMenu
-        .templateForElement(editor.getElement())
+        .templateForElement(entry)
         .find((item) => item.label === "Terminal");
 
       expect(terminal.submenu).toContain(
