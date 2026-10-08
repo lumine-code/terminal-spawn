@@ -51,6 +51,71 @@ describe("terminal-spawn", () => {
   });
 
   describe("terminal-spawn:root", () => {
+    it("uses the selected project root instead of falling back to the first project", () => {
+      const firstRoot = path.resolve(__dirname, "..");
+      const secondRoot = path.resolve(__dirname, "../../lumine");
+      lumine.project.setPaths([firstRoot, secondRoot]);
+      const tree = document.createElement("div");
+      tree.className = "tree-view";
+      const selected = document.createElement("li");
+      selected.className = "selected";
+      selected.getPath = () => secondRoot;
+      tree.appendChild(selected);
+      workspaceElement.appendChild(tree);
+
+      lumine.commands.dispatch(workspaceElement, "terminal-spawn:root");
+      expect(mainModule.spawnCommand).toHaveBeenCalledWith(
+        `test-terminal "${secondRoot}"`,
+        secondRoot,
+      );
+    });
+
+    it("chooses the deepest containing project for the active file", async () => {
+      const outerRoot = path.resolve(__dirname, "..");
+      const innerRoot = __dirname;
+      lumine.project.setPaths([outerRoot, innerRoot]);
+      await lumine.workspace.open(__filename);
+
+      lumine.commands.dispatch(workspaceElement, "terminal-spawn:root");
+      expect(mainModule.spawnCommand).toHaveBeenCalledWith(
+        `test-terminal "${innerRoot}"`,
+        innerRoot,
+      );
+    });
+
+    it("resolves the active pane item's public file path", () => {
+      const firstRoot = path.resolve(__dirname, "..");
+      const secondRoot = path.resolve(__dirname, "../../lumine");
+      lumine.project.setPaths([firstRoot, secondRoot]);
+      spyOn(lumine.workspace, "getActivePaneItem").and.returnValue({
+        getPath: () => path.join(secondRoot, "README.md"),
+      });
+
+      lumine.commands.dispatch(workspaceElement, "terminal-spawn:root");
+      expect(mainModule.spawnCommand).toHaveBeenCalledWith(
+        `test-terminal "${secondRoot}"`,
+        secondRoot,
+      );
+    });
+
+    if (process.platform === "win32") {
+      it("matches a project path regardless of its Windows letter case", () => {
+        const firstRoot = path.resolve(__dirname, "..");
+        const secondRoot = path.resolve(__dirname, "../../lumine");
+        lumine.project.setPaths([firstRoot, secondRoot]);
+        spyOn(lumine.workspace, "getActivePaneItem").and.returnValue({
+          buffer: { file: { path: path.join(secondRoot, "README.md").toUpperCase() } },
+          getPath: () => path.join(secondRoot, "README.md").toUpperCase(),
+        });
+
+        lumine.commands.dispatch(workspaceElement, "terminal-spawn:root");
+        expect(mainModule.spawnCommand).toHaveBeenCalledWith(
+          `test-terminal "${secondRoot}"`,
+          secondRoot,
+        );
+      });
+    }
+
     it("spawns the configured terminal at the project root", () => {
       lumine.project.setPaths([__dirname]);
       const root = lumine.project.getPaths()[0];
