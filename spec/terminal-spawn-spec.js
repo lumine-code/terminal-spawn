@@ -52,8 +52,8 @@ describe("terminal-spawn", () => {
 
   describe("terminal-spawn:root", () => {
     it("uses the selected project root instead of falling back to the first project", () => {
-      const firstRoot = path.resolve(__dirname, "..");
-      const secondRoot = path.resolve(__dirname, "../../lumine");
+      const firstRoot = path.resolve(__dirname, "../lib");
+      const secondRoot = __dirname;
       lumine.project.setPaths([firstRoot, secondRoot]);
       const tree = document.createElement("div");
       tree.className = "tree-view";
@@ -84,11 +84,11 @@ describe("terminal-spawn", () => {
     });
 
     it("resolves the active pane item's public file path", () => {
-      const firstRoot = path.resolve(__dirname, "..");
-      const secondRoot = path.resolve(__dirname, "../../lumine");
+      const firstRoot = path.resolve(__dirname, "../lib");
+      const secondRoot = __dirname;
       lumine.project.setPaths([firstRoot, secondRoot]);
       spyOn(lumine.workspace, "getActivePaneItem").and.returnValue({
-        getPath: () => path.join(secondRoot, "README.md"),
+        getPath: () => __filename,
       });
 
       lumine.commands.dispatch(workspaceElement, "terminal-spawn:root");
@@ -100,12 +100,12 @@ describe("terminal-spawn", () => {
 
     if (process.platform === "win32") {
       it("matches a project path regardless of its Windows letter case", () => {
-        const firstRoot = path.resolve(__dirname, "..");
-        const secondRoot = path.resolve(__dirname, "../../lumine");
+        const firstRoot = path.resolve(__dirname, "../lib");
+        const secondRoot = __dirname;
         lumine.project.setPaths([firstRoot, secondRoot]);
         spyOn(lumine.workspace, "getActivePaneItem").and.returnValue({
-          buffer: { file: { path: path.join(secondRoot, "README.md").toUpperCase() } },
-          getPath: () => path.join(secondRoot, "README.md").toUpperCase(),
+          buffer: { file: { path: __filename.toUpperCase() } },
+          getPath: () => __filename.toUpperCase(),
         });
 
         lumine.commands.dispatch(workspaceElement, "terminal-spawn:root");
