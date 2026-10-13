@@ -13,6 +13,8 @@ Distinct from the built-in `terminal` package: this one launches the OS terminal
 - **Preset list**: pick from a list of per-platform terminal presets to populate the settings.
 - **Lumine MCP targeting**: new terminals inherit the current window's bridge port when `lumine-mcp` is available, while every agent still needs your approval before it can connect.
 
+![Choose a preset for launching an external terminal.](.github/demo.png)
+
 ## Installation
 
 To install `terminal-spawn` search for it in the Install pane of the Lumine settings, or run the command `lumine --install lumine-code/terminal-spawn`.

@@ -1,0 +1,17 @@
+{
+  "title": "terminal-spawn",
+  "description": "Choose a preset for launching an external terminal.",
+  "recordedOn": "2026-10-13",
+  "sourceRevision": "ce1c17572b0afe21e08f8ca05e8f3dda1122ff15",
+  "mode": "normal",
+  "fontSettings": "default",
+  "themeSourceRevision": "6564a9e21899b5541e9c8f8006f9be6d6d72e6ad",
+  "images": [
+    {
+      "file": "demo.png",
+      "label": "Choose a preset for launching an external terminal.",
+      "width": 1100,
+      "height": 730
+    }
+  ]
+}
