@@ -1,4 +1,37 @@
 {
+  "menu": [
+    {
+      "label": "File",
+      "submenu": [
+        {
+          "label": "New System Terminal",
+          "command": "terminal-spawn:open"
+        }
+      ]
+    },
+    {
+      "label": "Packages",
+      "submenu": [
+        {
+          "label": "Terminal Spawn",
+          "submenu": [
+            {
+              "label": "Spawn Terminal Here",
+              "command": "terminal-spawn:open"
+            },
+            {
+              "label": "Spawn Terminal at Project Root",
+              "command": "terminal-spawn:root"
+            },
+            {
+              "label": "Select Preset…",
+              "command": "terminal-spawn:list"
+            }
+          ]
+        }
+      ]
+    }
+  ],
   "context-menu": {
     ".tree-view .full-menu:not(.multi-select) .file, .tree-view .full-menu:not(.multi-select) .directory": [
       {
@@ -46,29 +79,5 @@
         "type": "separator"
       }
     ]
-  },
-  "menu": [
-    {
-      "label": "Packages",
-      "submenu": [
-        {
-          "label": "Terminal Spawn",
-          "submenu": [
-            {
-              "label": "Spawn Terminal Here",
-              "command": "terminal-spawn:open"
-            },
-            {
-              "label": "Spawn Terminal at Project Root",
-              "command": "terminal-spawn:root"
-            },
-            {
-              "label": "Select Preset…",
-              "command": "terminal-spawn:list"
-            }
-          ]
-        }
-      ]
-    }
-  ]
+  }
 }
