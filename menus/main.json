@@ -5,7 +5,9 @@
       "submenu": [
         {
           "label": "New System Terminal",
-          "command": "terminal-spawn:open"
+          "command": "terminal-spawn:open",
+          "group": "new",
+          "order": 70
         }
       ]
     },
