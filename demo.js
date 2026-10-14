@@ -22,7 +22,10 @@ module.exports = {
         }
       },
       ready() {
-        return Boolean(document.body.innerText.includes("PowerShell"));
+        const list = document.querySelector(".terminal-spawn-list");
+        return (
+          list?.getBoundingClientRect().height > 0 && Boolean(list.querySelector('[role="option"]'))
+        );
       },
     },
   ],
