@@ -18,15 +18,15 @@
           "label": "Terminal Spawn",
           "submenu": [
             {
-              "label": "Spawn Terminal Here",
+              "label": "Open System Terminal Here",
               "command": "terminal-spawn:open"
             },
             {
-              "label": "Spawn Terminal at Project Root",
+              "label": "Open System Terminal at Project Root",
               "command": "terminal-spawn:root"
             },
             {
-              "label": "Select Preset…",
+              "label": "Select Terminal Preset…",
               "command": "terminal-spawn:list"
             }
           ]
@@ -59,18 +59,22 @@
             "type": "separator"
           },
           {
-            "label": "Spawn New",
+            "label": "Open System Terminal",
             "afterGroupContaining": [
               "terminal:open-split-bottom-dock-context-menu",
               "terminal:open-center-context-menu",
               "terminal:open"
             ],
-            "command": "terminal-spawn:open"
+            "command": "terminal-spawn:open",
+            "group": "system",
+            "order": 10
           },
           {
             "type": "separator"
           }
-        ]
+        ],
+        "group": "tools",
+        "order": 30
       },
       {
         "type": "separator"

@@ -192,7 +192,7 @@ describe("terminal-spawn", () => {
   });
 
   describe("the context menu", () => {
-    it("offers Spawn New inside the tree view's shared Terminal submenu", () => {
+    it("offers Open System Terminal inside the tree view's shared Terminal submenu", () => {
       const treeView = document.createElement("div");
       treeView.classList.add("tree-view");
       const list = document.createElement("ol");
@@ -208,7 +208,7 @@ describe("terminal-spawn", () => {
 
       expect(terminal.submenu).toContain(
         jasmine.objectContaining({
-          label: "Spawn New",
+          label: "Open System Terminal",
           command: "terminal-spawn:open",
         }),
       );
