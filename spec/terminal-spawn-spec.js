@@ -151,6 +151,24 @@ describe("terminal-spawn", () => {
   });
 
   describe("terminal-spawn:open", () => {
+    it("uses the center document instead of a stale tree selection from another project", async () => {
+      const tree = document.createElement("div");
+      tree.className = "tree-view";
+      const selected = document.createElement("li");
+      selected.className = "selected";
+      selected.getPath = () => path.resolve(__dirname, "../lib");
+      tree.appendChild(selected);
+      workspaceElement.appendChild(tree);
+      await lumine.workspace.open(__filename);
+
+      lumine.commands.dispatch(workspaceElement, "terminal-spawn:open");
+
+      expect(mainModule.spawnCommand).toHaveBeenCalledWith(
+        `test-terminal "${__dirname}"`,
+        __dirname,
+      );
+    });
+
     it("spawns the terminal in the active file's directory", async () => {
       const editor = await lumine.workspace.open(__filename);
       const editorElement = lumine.views.getView(editor);
