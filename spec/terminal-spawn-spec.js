@@ -51,6 +51,27 @@ describe("terminal-spawn", () => {
   });
 
   describe("terminal-spawn:root", () => {
+    it("uses the invoking document's project instead of a stale tree selection", async () => {
+      const firstRoot = path.resolve(__dirname, "../lib");
+      const documentRoot = __dirname;
+      lumine.project.setPaths([firstRoot, documentRoot]);
+      const tree = document.createElement("div");
+      tree.className = "tree-view";
+      const selected = document.createElement("li");
+      selected.className = "selected";
+      selected.getPath = () => firstRoot;
+      tree.appendChild(selected);
+      workspaceElement.appendChild(tree);
+      const editor = await lumine.workspace.open(__filename);
+
+      lumine.commands.dispatch(editor.getElement(), "terminal-spawn:root");
+
+      expect(mainModule.spawnCommand).toHaveBeenCalledWith(
+        `test-terminal "${documentRoot}"`,
+        documentRoot,
+      );
+    });
+
     it("uses the selected project root instead of falling back to the first project", () => {
       const firstRoot = path.resolve(__dirname, "../lib");
       const secondRoot = __dirname;
