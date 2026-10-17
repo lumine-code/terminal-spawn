@@ -388,6 +388,25 @@ describe("terminal-spawn", () => {
       expect(lumine.config.get("terminal-spawn.command")).toBe(preset.command);
       expect(lumine.config.get("terminal-spawn.commandWithArgs")).toBe(preset.commandWithArgs);
     });
+
+    it("applies multiple presets through one kept-open list", async () => {
+      await lumine.commands.dispatch(workspaceElement, "terminal-spawn:list");
+      const panel = lumine.workspace
+        .getModalPanels()
+        .find((panel) => panel.getElement().classList.contains("terminal-spawn-list"));
+      const list = panel.getElement().querySelector("lumine-input-dialog").getModel();
+      await list.runAction("select-list:toggle-keep-open");
+      const presets = list.getItems().slice(0, 2);
+      expect(presets.length).toBe(2);
+
+      for (const preset of presets) {
+        await list.selectItem(preset);
+        await list.confirmSelection();
+        expect(lumine.config.get("terminal-spawn.command")).toBe(preset.command);
+        expect(lumine.config.get("terminal-spawn.commandWithArgs")).toBe(preset.commandWithArgs);
+        expect(panel.isVisible()).toBe(true);
+      }
+    });
   });
 
   it("makes every Windows Terminal preset inherit the launching environment", () => {
