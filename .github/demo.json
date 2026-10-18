@@ -1,9 +1,9 @@
 {
   "title": "terminal-spawn",
   "description": "Choose a preset for launching an external terminal.",
-  "recordedOn": "2026-10-14",
-  "sourceRevision": "ea9f98dc76dd2be173bbf6c83532fa7672131533",
-  "themeSourceRevision": "7fbd047a87ecf1367c896b19ff270cdc28d319f7",
+  "recordedOn": "2026-10-18",
+  "sourceRevision": "d439948ca0a26c223112bd4f14d4c2dc771a86e1",
+  "themeSourceRevision": "45b22049e87256e9327beb0b350e67fe81d7fc81",
   "mode": "normal",
   "fontSettings": "default",
   "scenario": "demo.js",
@@ -11,8 +11,8 @@
   "environment": {
     "platform": "win32",
     "arch": "x64",
-    "electron": "44.7.0",
-    "chrome": "152.0.7977.130",
+    "electron": "44.9.0",
+    "chrome": "152.0.7977.167",
     "devicePixelRatio": 1,
     "locale": "en-GB",
     "fontFamily": "Fira Code, Menlo, DejaVu Sans Mono, Consolas, monospace",
@@ -21,29 +21,30 @@
   },
   "viewport": { "width": 1100, "height": 730 },
   "cornerRadius": 10,
+  "privacy": { "version": 1, "location": "neutral", "textChecked": true },
   "sources": {
     "editor": {
-      "revision": "ca7198ebc05410bb29a14259434e77c94a714b24",
+      "revision": "10950c83cb6d964aadbcf4036af67c6484c1341d",
       "dirty": false,
       "workingTreeHash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
     },
     "package": {
-      "revision": "ea9f98dc76dd2be173bbf6c83532fa7672131533",
+      "revision": "d439948ca0a26c223112bd4f14d4c2dc771a86e1",
       "dirty": false,
       "workingTreeHash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
     },
     "terminal-spawn": {
-      "revision": "ea9f98dc76dd2be173bbf6c83532fa7672131533",
+      "revision": "d439948ca0a26c223112bd4f14d4c2dc771a86e1",
       "dirty": false,
       "workingTreeHash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
     },
     "language-javascript": {
-      "revision": "ae2e6968e3a349fb4d09ce53e339a0f8cce903aa",
+      "revision": "721d40ef20e4ffda4125b375f50c908541fa7c08",
       "dirty": false,
       "workingTreeHash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
     },
     "one-theme": {
-      "revision": "7fbd047a87ecf1367c896b19ff270cdc28d319f7",
+      "revision": "45b22049e87256e9327beb0b350e67fe81d7fc81",
       "dirty": false,
       "workingTreeHash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
     }
@@ -60,7 +61,7 @@
       "label": "Choose a preset for launching an external terminal.",
       "width": 1100,
       "height": 730,
-      "sha256": "fcb0e21388fb70476ed83a7c2da7c2d6f0bb5a64bc714622dd030dbe88f0e5c5"
+      "sha256": "e0a49358896f0ad144e3bbc3c0c8c7b80dcdd846b4c0814fe8d3f4192b729012"
     }
   ]
 }
