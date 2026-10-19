@@ -1,17 +1,6 @@
 {
   "menu": [
     {
-      "label": "File",
-      "submenu": [
-        {
-          "label": "New System Terminal",
-          "command": "terminal-spawn:open",
-          "group": "new",
-          "order": 70
-        }
-      ]
-    },
-    {
       "label": "Packages",
       "submenu": [
         {
